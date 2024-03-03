@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        overflow: hidden;
+        padding: 0;
+        margin: 0;
+      }
+      * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+    </style>
+    <link rel="stylesheet" href="css-loading.css" />
+  </head>
+  <body>
+    <div id="pace" class="pace">
+      <div id="pace-progress" class="pace-progress" data-progress-text="10%">
+        <div class="pace-progress-inner"></div>
+      </div>
+    </div>
+    <div id="mainwrapper" class="mainwrapper"></div>
+    <div id="popup-video">
+      <div class="video-content">
+        <div class="imgContent">
+          <img id="imgItem" src="" alt="">
+        </div>
+        <button id="btn-close" class="btn-close">
+          <svg t="1709481062463" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4368" width="30" height="30"><path d="M509.866667 32C245.333333 32 32 247.466667 32 512s213.333333 480 477.866667 480S987.733333 776.533333 987.733333 512 774.4 32 509.866667 32z m0 896C281.6 928 96 742.4 96 512S281.6 96 509.866667 96 923.733333 281.6 923.733333 512s-185.6 416-413.866666 416z" fill="currentColor" p-id="4369"></path><path d="M693.333333 330.666667c-12.8-12.8-32-12.8-44.8 0L512 467.2l-136.533333-136.533333c-12.8-12.8-32-12.8-44.8 0-12.8 12.8-12.8 32 0 44.8l136.533333 136.533333-136.533333 136.533333c-12.8 12.8-12.8 32 0 44.8 6.4 6.4 14.933333 8.533333 23.466666 8.533334s17.066667-2.133333 23.466667-8.533334l136.533333-136.533333 136.533334 136.533333c6.4 6.4 14.933333 8.533333 23.466666 8.533334s17.066667-2.133333 23.466667-8.533334c12.8-12.8 12.8-32 0-44.8L556.8 512l136.533333-136.533333c12.8-12.8 12.8-32 0-44.8z" fill="currentColor" p-id="4370"></path></svg>
+        </button>
+      </div>
+    </div>
+  </body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://82mou.github.io/threejs/js/OrbitControls.js"></script>
+  <script src="https://unpkg.com/gsap@3.9.1/dist/gsap.min.js"></script>
+  <script src="./app.js"></script>
+</html>

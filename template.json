@@ -1,0 +1,81 @@
+{
+  "header": {
+    "id": "1",
+    "title": "main menu",
+    "logo": "",
+    "favicon": "",
+    "showInputSearch": true,
+    "showCart": false,
+    "headerLogo": "",
+    "headerLogoFavicon": "",
+    "headerBgColor": "892cdc",
+    "headerTextColor": "ffffff",
+    "headerTextHoverColor": "c9c0fc",
+    "items": [
+      {
+        "key": "1378582c-351b-49bc-8f61-509c7a432bec",
+        "url": "/[pageId]",
+        "title": "TOP",
+        "baseUrl": "/[pageId]",
+        "children": []
+      },
+      {
+        "key": 1,
+        "title": "コミュニティ",
+        "url": "/[pageId]/community",
+        "baseUrl": "/[pageId]/community",
+        "children": []
+      },
+      {
+        "key": "58af955a-b8c3-4d40-a13b-2482be174950",
+        "title": "投稿",
+        "url": "/[pageId]/community/feed",
+        "baseUrl": "/[pageId]/community/feed",
+        "children": []
+      },
+      {
+        "key": "f13921f3-c61c-43b2-8684-e59972176a3c",
+        "url": "/[pageId]/video",
+        "title": "映像",
+        "baseUrl": "/[pageId]/video",
+        "children": []
+      },
+      {
+        "key": "588a98b7-775c-42e6-a010-14aa25a86e2b",
+        "url": "/[pageId]/reservation",
+        "title": "ディスカッション",
+        "baseUrl": "/[pageId]/reservation",
+        "children": []
+      },
+      {
+        "key": "ab587e95-dcda-4cee-8d7b-0d33fd06ddeb",
+        "title": "商品",
+        "url": "/[pageId]/product",
+        "baseUrl": "/[pageId]/product",
+        "children": []
+      },
+      {
+        "key": "6913bc78-cff9-4d7d-94fa-cd7637e2ed5d",
+        "title": "プレミアムメンバー",
+        "url": "/[pageId]/premium-member",
+        "baseUrl": "/[pageId]/premium-member",
+        "children": []
+      },
+      {
+        "key": "af856696-8828-4ad1-b7a5-6d410c5609da",
+        "title": "プロフィール",
+        "url": "/[pageId]/page/profile",
+        "baseUrl": "/[pageId]/page/profile",
+        "children": []
+      }
+    ]
+  },
+  "common": {
+    "backgroundColor": "ffffff",
+    "primaryColor": "bc6ff1",
+    "successColor": "52c41a",
+    "warningColor": "faad14",
+    "errorColor": "ff4d4f",
+    "buttonBorderRadius": 25
+  }
+}
