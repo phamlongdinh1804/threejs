@@ -513,23 +513,30 @@ function onWindowResize() {
 var isShowPopup = false;
 function handleShowPopup(data) {
   isShowPopup = true;
-  const popupEle = document.getElementById("popup-video");
-  popupEle.classList.add("show");
+  document.getElementById("modalOpacity").classList.add("show");
   setTimeout(() => {
-    var imgEle = document.getElementById("imgItem");
-    imgEle.setAttribute("src", data.img);
-    imgEle.classList.add("show");
-  }, 600);
+    document.getElementsByClassName("modal-mask")[0].classList.toggle("show");
+  }, 500);
+
+  // const popupEle = document.getElementById("popup-video");
+  // popupEle.classList.add("show");
+  // setTimeout(() => {
+  //   var imgEle = document.getElementById("imgItem");
+  //   imgEle.setAttribute("src", data.img);
+  //   imgEle.classList.add("show");
+  // }, 600);
 }
-var button = document.getElementById("btn-close");
-button.addEventListener("click", handleClose);
+// var button = document.getElementById("btn-close");
+// button.addEventListener("click", handleClose);
 function handleClose() {
   isShowPopup = false;
-  const popupEle = document.getElementById("popup-video");
-  popupEle.classList.remove("show");
-  var imgEle = document.getElementById("imgItem");
-  imgEle.setAttribute("src", "");
-  imgEle.classList.remove("show");
+  document.getElementById("modalOpacity").classList.remove("show");
+  document.getElementsByClassName("modal-mask")[0].classList.toggle("show");
+  // const popupEle = document.getElementById("popup-video");
+  // popupEle.classList.remove("show");
+  // var imgEle = document.getElementById("imgItem");
+  // imgEle.setAttribute("src", "");
+  // imgEle.classList.remove("show");
   isAutoRotate = true;
   handleCameraZoom(4, 500);
 }
