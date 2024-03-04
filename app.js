@@ -308,7 +308,8 @@ function startRendering() {
     z: zoomScale,
     ease: "power2.out",
   });
-  handleCameraZoom(4, 1500);
+  const zoomValue = (window.innerWidth / 1680) * 4;
+  handleCameraZoom(zoomValue, 1500);
 }
 
 document.addEventListener("click", function (event) {
@@ -538,5 +539,6 @@ function handleClose() {
   // imgEle.setAttribute("src", "");
   // imgEle.classList.remove("show");
   isAutoRotate = true;
-  handleCameraZoom(4, 500);
+  const zoomValue = (window.innerWidth / 1680) * 4;
+  handleCameraZoom(zoomValue, 500);
 }
