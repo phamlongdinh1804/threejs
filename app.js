@@ -50,27 +50,54 @@ camera.updateProjectionMatrix();
 const boxWidth = 5.53;
 const boxHeight = boxWidth / (16 / 9);
 var geom = new THREE.BoxBufferGeometry(boxWidth, boxHeight, 0.05);
-console.log("geom: ", geom);
 var imageUrlArray = [];
 for (var i = 1; i <= 20; i++) {
   const newUrl = `./img/img_${i}.jpg`;
   imageUrlArray.push(newUrl);
 }
+function randomTwoNumbers() {
+  const min = 1;
+  const max = 15;
+  const randomNumber1 = Math.floor(Math.random() * (max - min + 1)) + min;
+  const randomNumber2 = Math.floor(Math.random() * (max - min + 1)) + min;
+  const randomNumber3 = Math.floor(Math.random() * (max - min + 1)) + min;
+  const randomNumber4 = Math.floor(Math.random() * (max - min + 1)) + min;
+  return [randomNumber1, randomNumber2, randomNumber3, randomNumber4];
+}
+
 const floors = [];
 let img_count = 1;
 for (var i = 1; i <= 5; i++) {
+  const randoms = randomTwoNumbers();
   const newFloor = {
     floor_id: i,
     items: [],
   };
   for (let j = 1; j <= 15; j++) {
-    newFloor.items.push({
-      url: `./img/img_${img_count}.jpg`,
-    });
-    if (img_count == 17) {
-      img_count = 1;
+    if (j == randoms[0]) {
+      newFloor.items.push({
+        type: `OBJECT`,
+        key: "003",
+      });
+    } else if (j == randoms[1]) {
+      newFloor.items.push({
+        type: `OBJECT`,
+        key: "002",
+      });
+    } else if (j == randoms[3]) {
+      newFloor.items.push({
+        type: `OBJECT`,
+        key: "004",
+      });
     } else {
-      img_count++;
+      newFloor.items.push({
+        url: `./img/img_${img_count}.jpg`,
+      });
+      if (img_count == 17) {
+        img_count = 1;
+      } else {
+        img_count++;
+      }
     }
   }
   floors.push(newFloor);
@@ -88,35 +115,83 @@ function createNewItemTop() {
   if (currentIdTop >= 5) {
     currentIdTop = 1;
   }
-  for (let i = 0; i < objPerTurn; i++) {
-    // Tạo một item mới
-    var newItem = new THREE.Mesh(
-      geom,
-      new THREE.MeshBasicMaterial({
-        map: textures[i],
-        side: THREE.DoubleSide,
-      })
-    );
-
-    newItem.name = `floor_id_${currentIdTop}_${i + 1}`;
-    newItem.userData.url = "https://onetech.vn";
-    newItem.userData.img = `./img/img_${i + 1}.jpg`;
-
-    // Đặt vị trí của item mới tương ứng với vị trí của scene
-    newItem.position.copy(lastItem.position);
+  const currentFloor = floors.find((floor) => floor.floor_id == currentIdTop);
+  for (const [i, item] of currentFloor.items.entries()) {
     let spiralHeight = lastPosition * heightStep;
-    newItem.position.set(
-      Math.cos(angleStep * i) * spiralRadius,
-      spiralHeight,
-      Math.sin(angleStep * i) * spiralRadius
-    );
-    newItem.rotation.y = -angleStep * i + Math.PI / 2;
-    // Add Event
-    newItem.onClick = function (e) {
-      console.log("onMouseUp");
-    };
-    // Thêm item mới vào scene và danh sách các item
-    scene.add(newItem);
+    if (item?.type === "OBJECT") {
+      const targetObject = objects.find((obj) => obj.key === item.key);
+      const loader = new THREE.OBJLoader2();
+      new THREE.TextureLoader().load(targetObject.img, function (texture) {
+        const materials = new THREE.MeshBasicMaterial({ map: texture });
+        loader.load(targetObject.obj, function (event) {
+          // Xử lý object đã load
+          const object = event.detail.loaderRootNode;
+          object.position.set(
+            Math.cos(angleStep * i) * spiralRadius,
+            spiralHeight,
+            Math.sin(angleStep * i) * spiralRadius
+          );
+          object.traverse((child) => {
+            if (child instanceof THREE.Mesh) {
+              child.material = materials;
+              child.onClick = function () {
+                console.log("Object clicked!");
+                // Add your click event handling logic here
+              };
+              child.userData.type = `OBJECT`;
+              child.userData.name = `floor_id_${currentIdBottom}_${i + 1}`;
+              child.userData.position = object.position;
+              child.userData.rotation = {
+                x: 0,
+                y: -angleStep * i + Math.PI / 2,
+                z: 0,
+              };
+            }
+          });
+
+          scene.add(object);
+
+          setTimeout(() => {
+            const tlObject = gsap.timeline({ repeat: -1 });
+            tlObject.to(object.rotation, {
+              duration: 15,
+              x: Math.PI * 2,
+              y: Math.PI * 2,
+              z: Math.PI * 2,
+              ease: "linear",
+            });
+          }, Math.floor(Math.random() * 900) + 100);
+        });
+      });
+    } else {
+      // Tạo một item mới
+      var newItem = new THREE.Mesh(
+        geom,
+        new THREE.MeshBasicMaterial({
+          map: textures[i],
+          side: THREE.DoubleSide,
+        })
+      );
+
+      newItem.name = `floor_id_${currentIdTop}_${i + 1}`;
+      newItem.userData.url = "https://onetech.vn";
+      newItem.userData.img = `./img/img_${i + 1}.jpg`;
+
+      // Đặt vị trí của item mới tương ứng với vị trí của scene
+      newItem.position.copy(lastItem.position);
+      newItem.position.set(
+        Math.cos(angleStep * i) * spiralRadius,
+        spiralHeight,
+        Math.sin(angleStep * i) * spiralRadius
+      );
+      newItem.rotation.y = -angleStep * i + Math.PI / 2;
+      // Add Event
+      newItem.onClick = function (e) {
+        console.log("onMouseUp");
+      };
+      // Thêm item mới vào scene và danh sách các item
+      scene.add(newItem);
+    }
   }
   const newItemT = {
     position: lastPosition,
@@ -133,34 +208,82 @@ function createNewItemBottom() {
   if (currentIdBottom <= 0) {
     currentIdBottom = 5;
   }
-  for (let i = 0; i < objPerTurn; i++) {
-    // Tạo một item mới
-    var newItem = new THREE.Mesh(
-      geom,
-      new THREE.MeshBasicMaterial({
-        map: textures[i],
-        side: THREE.DoubleSide,
-      })
-    );
-    newItem.name = `floor_id_${currentIdBottom}_${i + 1}`;
-    newItem.userData.url = "https://onetech.vn";
-    newItem.userData.img = `./img/img_${i + 1}.jpg`;
-
-    // Đặt vị trí của item mới tương ứng với vị trí của scene
-    newItem.position.copy(lastItem.position);
+  const currentFloor = floors.find((floor) => floor.floor_id == currentIdTop);
+  for (const [i, item] of currentFloor.items.entries()) {
     let spiralHeight = lastPosition * heightStep;
-    newItem.position.set(
-      Math.cos(angleStep * i) * spiralRadius,
-      spiralHeight,
-      Math.sin(angleStep * i) * spiralRadius
-    );
-    newItem.rotation.y = -angleStep * i + Math.PI / 2;
-    // Add Event
-    newItem.onClick = function (e) {
-      console.log("onMouseUp");
-    };
-    // Thêm item mới vào scene và danh sách các item
-    scene.add(newItem);
+    if (item?.type === "OBJECT") {
+      const targetObject = objects.find((obj) => obj.key === item.key);
+      const loader = new THREE.OBJLoader2();
+      new THREE.TextureLoader().load(targetObject.img, function (texture) {
+        const materials = new THREE.MeshBasicMaterial({ map: texture });
+        loader.load(targetObject.obj, function (event) {
+          // Xử lý object đã load
+          const object = event.detail.loaderRootNode;
+          object.position.set(
+            Math.cos(angleStep * i) * spiralRadius,
+            spiralHeight,
+            Math.sin(angleStep * i) * spiralRadius
+          );
+          object.traverse((child) => {
+            if (child instanceof THREE.Mesh) {
+              child.material = materials;
+              child.onClick = function () {
+                console.log("Object clicked!");
+                // Add your click event handling logic here
+              };
+              child.userData.type = `OBJECT`;
+              child.userData.name = `floor_id_${currentIdBottom}_${i + 1}`;
+              child.userData.position = object.position;
+              child.userData.rotation = {
+                x: 0,
+                y: -angleStep * i + Math.PI / 2,
+                z: 0,
+              };
+            }
+          });
+          scene.add(object);
+
+          setTimeout(() => {
+            const tlObject = gsap.timeline({ repeat: -1 });
+            tlObject.to(object.rotation, {
+              duration: 15,
+              x: Math.PI * 2,
+              y: Math.PI * 2,
+              z: Math.PI * 2,
+              ease: "linear",
+            });
+          }, Math.floor(Math.random() * 900) + 100);
+        });
+      });
+    } else {
+      // Tạo một item mới
+      var newItem = new THREE.Mesh(
+        geom,
+        new THREE.MeshBasicMaterial({
+          map: textures[i],
+          side: THREE.DoubleSide,
+        })
+      );
+
+      newItem.name = `floor_id_${currentIdBottom}_${i + 1}`;
+      newItem.userData.url = "https://onetech.vn";
+      newItem.userData.img = `./img/img_${i + 1}.jpg`;
+
+      // Đặt vị trí của item mới tương ứng với vị trí của scene
+      newItem.position.copy(lastItem.position);
+      newItem.position.set(
+        Math.cos(angleStep * i) * spiralRadius,
+        spiralHeight,
+        Math.sin(angleStep * i) * spiralRadius
+      );
+      newItem.rotation.y = -angleStep * i + Math.PI / 2;
+      // Add Event
+      newItem.onClick = function (e) {
+        console.log("onMouseUp");
+      };
+      // Thêm item mới vào scene và danh sách các item
+      scene.add(newItem);
+    }
   }
   const newItemT = {
     position: lastPosition,
@@ -200,41 +323,122 @@ function loadTexture(index) {
   });
   textures.push(texture);
 }
+const objects = [
+  {
+    key: "001",
+    img: "./objects/img/cup_noodle_map1.jpg",
+    obj: "./objects/Cup_Noodle3.obj",
+  },
+  {
+    key: "002",
+    img: "./objects/img/kanzenmeal_map.jpg",
+    obj: "./objects/kanzenmeal_B.obj",
+  },
+  {
+    key: "003",
+    img: "./objects/img/sisucorn_BIG20220215.jpg",
+    obj: "./objects/sisucorn_BIG20220215.obj",
+  },
+  {
+    key: "004",
+    img: "./objects/img/Webp.net-resizeimage.jpg",
+    obj: "./objects/raoh.obj",
+  },
+  {
+    key: "005",
+    img: "./objects/img/map.jpg",
+    obj: "./objects/donbe.obj",
+  },
+];
+function loadImgObject() {
+  for (const item of objects) {
+    new THREE.TextureLoader().load(item.img);
+  }
+}
+loadImgObject();
 // Start Tải Từ IMG đầu tiên
 loadTexture(1);
 // Render danh sách item đầu tiên
 function renderItem() {
   floors.forEach((floor, index) => {
     let j = index + 1;
-    for (let i = 0; i < objPerTurn; i++) {
-      var material = new THREE.MeshBasicMaterial({
-        map: textures[i],
-        side: THREE.DoubleSide,
-      });
-      let item = new THREE.Mesh(geom, material);
-      item.name = `floor_id_${floor.floor_id}_${i + 1}`;
-      item.userData.url = "https://onetech.vn";
-      item.userData.img = `./img/img_${i + 1}.jpg`;
-      // position
-      let spiralHeight = j * heightStep;
-      item.position.set(
-        Math.cos(angleStep * i) * spiralRadius,
-        spiralHeight,
-        Math.sin(angleStep * i) * spiralRadius
-      );
-      // rotation
-      item.rotation.y = -angleStep * i + Math.PI / 2;
+    for (const [i, item] of floor.items.entries()) {
+      if (item?.type === "OBJECT") {
+        const targetObject = objects.find((obj) => obj.key === item.key);
+        const loader = new THREE.OBJLoader2();
+        new THREE.TextureLoader().load(targetObject.img, function (texture) {
+          const materials = new THREE.MeshBasicMaterial({ map: texture });
+          loader.load(targetObject.obj, function (event) {
+            // Xử lý object đã load
+            const object = event.detail.loaderRootNode;
+            let spiralHeight = j * heightStep;
+            object.position.set(
+              Math.cos(angleStep * i) * spiralRadius,
+              spiralHeight,
+              Math.sin(angleStep * i) * spiralRadius
+            );
+            object.traverse((child) => {
+              if (child instanceof THREE.Mesh) {
+                child.material = materials;
+                child.onClick = function () {
+                  console.log("Object clicked!");
+                  // Add your click event handling logic here
+                };
+                child.userData.type = `OBJECT`;
+                child.userData.name = `floor_id_${currentIdBottom}_${i + 1}`;
+                child.userData.position = object.position;
+                child.userData.rotation = {
+                  x: 0,
+                  y: -angleStep * i + Math.PI / 2,
+                  z: 0,
+                };
+              }
+            });
 
-      const newItem = {
-        position: j,
-      };
-      // Add Event
-      item.onClick = function (e) {
-        console.log("onMouseUp");
-      };
+            scene.add(object);
 
-      scene.add(item);
-      items.push(newItem);
+            setTimeout(() => {
+              const tlObject = gsap.timeline({ repeat: -1 });
+              tlObject.to(object.rotation, {
+                duration: 15,
+                x: Math.PI * 2,
+                y: Math.PI * 2,
+                z: Math.PI * 2,
+                ease: "linear",
+              });
+            }, Math.floor(Math.random() * 1500) + 500);
+          });
+        });
+      } else {
+        var material = new THREE.MeshBasicMaterial({
+          map: textures[i],
+          side: THREE.DoubleSide,
+        });
+        let item = new THREE.Mesh(geom, material);
+        item.name = `floor_id_${floor.floor_id}_${i + 1}`;
+        item.userData.url = "https://onetech.vn";
+        item.userData.img = `./img/img_${i + 1}.jpg`;
+        // position
+        let spiralHeight = j * heightStep;
+        item.position.set(
+          Math.cos(angleStep * i) * spiralRadius,
+          spiralHeight,
+          Math.sin(angleStep * i) * spiralRadius
+        );
+        // rotation
+        item.rotation.y = -angleStep * i + Math.PI / 2;
+
+        const newItem = {
+          position: j,
+        };
+        // Add Event
+        item.onClick = function (e) {
+          console.log("onMouseUp");
+        };
+
+        scene.add(item);
+        items.push(newItem);
+      }
     }
   });
 }
@@ -398,6 +602,7 @@ document.addEventListener("mouseup", function (event) {
 
   // Lấy danh sách đối tượng gặp ray
   var intersects = raycaster.intersectObjects(scene.children, true);
+  console.log("intersects: ", intersects);
   // Xử lý sự kiện click trên các đối tượng plane
   if (intersects.length > 0 && intersects[0].object.onClick) {
     itemMouseUp.name = intersects[0].object.name;
@@ -418,14 +623,23 @@ function handleClickObject() {
   }
 
   // Calculate the target rotation for the scene
-  const targetRotation = {
+  let targetRotation = {
     x: object.rotation.x,
     y: -object.rotation.y, // Invert rotation to match plane's rotation
     z: 0,
   };
-  console.log(object);
+  if (object.userData.type == "OBJECT") {
+    targetRotation = {
+      x: object.userData.rotation.x,
+      y: -object.userData.rotation.y, // Invert rotation to match plane's rotation
+      z: 0,
+    };
+  }
   const step = 13.2;
-  const spiralHeight = object.position.y;
+  const spiralHeight =
+    object.userData.type == "OBJECT"
+      ? object.userData.position.y
+      : object.position.y;
   const currentTurn = spiralHeight / 6 - 3;
   const targetYPosition = -currentTurn * step;
   // // Animate scene rotation to target rotation
