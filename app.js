@@ -406,7 +406,7 @@ function renderItem() {
                 z: Math.PI * 2,
                 ease: "linear",
               });
-            }, Math.floor(Math.random() * 1500) + 500);
+            }, Math.floor(Math.random() * 500) + 100);
           });
         });
       } else {
